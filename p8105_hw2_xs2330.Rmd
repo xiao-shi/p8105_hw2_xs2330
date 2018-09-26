@@ -9,3 +9,17 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
+
+## Problem 1
+Import and tidy data
+```{r}
+NYC_Transit = 
+  read_csv("data_hw2/nyc_subway.csv") %>%
+  janitor::clean_names() %>%
+  gather(key = "type", value = "routes_served", route1:route11) %>%
+  select(line, station_name, station_latitude, station_longitude, routes_served, entry, vending, entrance_type, ada)
+NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
+
+```
+
+
