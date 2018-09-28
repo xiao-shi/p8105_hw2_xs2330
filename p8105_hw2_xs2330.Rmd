@@ -16,10 +16,6 @@ Import and tidy data
 NYC_Transit = 
   read_csv("data_hw2/nyc_subway.csv") %>%
   janitor::clean_names() %>%
-  gather(key = "type", value = "routes_served", route1:route11) %>%
-  select(line, station_name, station_latitude, station_longitude, routes_served, entry, vending, entrance_type, ada)
+  select(line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada)
 NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
-
 ```
-
-
