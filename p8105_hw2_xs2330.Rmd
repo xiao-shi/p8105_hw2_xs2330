@@ -19,3 +19,9 @@ NYC_Transit =
   select(line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada)
 NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
 ```
+
+The NYC_Transit dataset contains detailed information on station, routing, staffing, ada compliance, and vending. I used the janitor package to clean up the original data, and used select to choose the variables that will be focused on for this analysis. The dimension is 1868 x 32. However, the data is not tidy yet because the route number is spread across 11 columns.
+
+
+
+
