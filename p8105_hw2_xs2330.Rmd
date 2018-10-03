@@ -112,3 +112,13 @@ brfss = brfss_smart2010 %>%
   mutate(exc_vgood = excellent + very_good)
 head(brfss)
 ```
+
+**unique locations**
+```{r}
+num_uniq_location = length(unique(brfss$locationdesc))
+num_uniq_states = length(unique(brfss$locationabbr))
+freq_state = plyr::count(brfss, "locationabbr")
+highest_fre_state = freq_state[which.max(freq_state$freq),1]
+```
+The number of unique locations is `r num_uniq_location`. The number of states that's been represented
+is `r num_uniq_states`. Since all 50 states are included, we conclude that all states are represented. `r highest_fre_state` is observed the most.
