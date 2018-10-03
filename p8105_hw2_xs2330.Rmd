@@ -19,6 +19,7 @@ NYC_Transit =
   janitor::clean_names() %>%
   select(line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, 
          route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada)
+head(NYC_Transit)
 NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
 ```
 
@@ -27,6 +28,7 @@ The `NYC_transit` dataset contains detailed information on station, routing, sta
 **Distinct stations**
 ```{r}
 distin_line = distinct(NYC_Transit[,c("line","station_name")])
+head(distin_line)
 ```
 The amount of distinct stations is `r nrow(distin_line)`
 
@@ -35,6 +37,7 @@ The amount of distinct stations is `r nrow(distin_line)`
 distin_ada_comp = select(NYC_Transit, line, station_name, ada) %>%
   distinct() %>%
   filter(ada == "TRUE")
+head(distin_ada_comp)
 ```
 There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 
@@ -43,6 +46,7 @@ There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 distin_entry_novend = select(NYC_Transit, line, station_name, entry, vending) %>%
   distinct() %>%
   filter(vending == "NO")
+head(distin_entry_novend)
 prop_entry_novend = mean(distin_entry_novend$entry == "TRUE")
 ```
 The proportion of station entrances / exits without vending allow entrance is `r prop_entry_novend`
@@ -64,6 +68,7 @@ dumps =
   read_excel("./data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = 'Mr. Trash Wheel', range = cell_cols(1:14)) %>%
   janitor::clean_names() %>%
   na.omit(dumps)
+head(dumps)
 dumps$sports_balls = as.integer(dumps$sports_balls)
 ```
 
@@ -85,7 +90,25 @@ precip_2017$year_17 = 2017
 ```{r}
 precip_1617 = left_join(precip_2016, precip_2017,by = "month")
 precip_1617$month = month.name
+head(precip_1617)
 ```
 
 **Summary of problem2 data**     
 The number of observations in the trash wheel data is `r nrow(dumps)` rows by `r ncol(dumps)` columns. The number of observations in the precipitation data is `r nrow(precip_1617)` rows by `r ncol(precip_1617)` columns. Key variables in the trash wheel data includes trash wheel index by `dumpster`, date of collection by `date`, weight of the specific trash wheel by `weight_tons`, and types of trash collected such as `plastic_bottles`, `chips_bag`, and `sports_balls`. Key variables in the precipitation data includes precipitation data such as `total_precip_16` and `total_precip_17` for the year 2016 and 2017, by month. The total precipitation in 2017 was `r sum(precip_1617$total_precip_17, na.rm = TRUE)`. The median number of sports balls in the dumpster in 2016 was `r median(dumps$sports_balls)`.
+
+## Problem 3
+**load data from p8105 package**
+```{r loading data}
+library(p8105.datasets)
+```
+**tidy and manipulate data**
+```{r}
+brfss = brfss_smart2010 %>%
+  janitor::clean_names() %>%
+  filter(str_detect(topic, "Overall Health") == TRUE) %>%
+  select(year, locationabbr, locationdesc, response, data_value) %>%
+  spread(key = response, value = data_value) %>%
+  janitor::clean_names() %>%
+  mutate(exc_vgood = excellent + very_good)
+head(brfss)
+```
