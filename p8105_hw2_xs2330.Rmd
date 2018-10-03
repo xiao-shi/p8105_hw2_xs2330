@@ -12,7 +12,7 @@ library(readxl)
 ```
 
 ## Problem 1
-*Import, select, and tidy data*
+**Import, select, and tidy data**
 ```{r prob1 import data, message=FALSE}
 NYC_Transit = 
   read_csv("./data_hw2/nyc_subway.csv") %>%
@@ -24,9 +24,9 @@ NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
 
 The `NYC_transit` dataset contains detailed information on station, routing, staffing, ada compliance, and vending. I used the janitor package to clean up the original data, and used the select function to choose the variables that will be focused on for this analysis. The dimension is `r nrow(NYC_Transit)` rows by `r ncol(NYC_Transit)` columns. However, the data is NOT tidy yet because the route number (variables route1 to route11) is spread across 11 columns.
 
-**distinct stations**
+**Distinct stations**
 ```{r}
-distin_line = distinct(NYC_Transit[,1:2])
+distin_line = distinct(NYC_Transit[,c("line","station_name")])
 ```
 The amount of distinct stations is `r nrow(distin_line)`
 
@@ -36,9 +36,9 @@ distin_ada_comp = select(NYC_Transit, line, station_name, ada) %>%
   distinct() %>%
   filter(ada == "TRUE")
 ```
-`r nrow(distin_ada_comp)` stations are ADA compliant
+There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 
-**proportion of station exits without vending that allow entrance**
+**Proportion of station exits without vending that allow entrance**
 ```{r}
 distin_entry_novend = select(NYC_Transit, line, station_name, entry, vending) %>%
   distinct() %>%
@@ -46,3 +46,14 @@ distin_entry_novend = select(NYC_Transit, line, station_name, entry, vending) %>
 prop_entry_novend = mean(distin_entry_novend$entry == "TRUE")
 ```
 The proportion of station entrances / exits without vending allow entrance is `r prop_entry_novend`
+
+**Reformat to tidy data**
+```{r}
+NYC_Transit = gather(NYC_Transit, key = "route_number", value = "route_name", route1:route11)
+station_line_a = distinct(NYC_Transit[,c("line","station_name","route_name","ada")]) %>%
+  filter(route_name == "A")
+station_line_a_ada = filter(station_line_a, ada == TRUE)
+```
+There are `r nrow(station_line_a)` distinct stations that serves the A train  
+There are `r nrow(station_line_a_ada)` distinct stations that serves the A train that are also ADA compliant
+
