@@ -26,14 +26,14 @@ NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
 The `NYC_transit` dataset contains detailed information on station, routing, staffing, ada compliance, and vending. I used the janitor package to clean up the original data, and used the select function to choose the variables that will be focused on for this analysis. The dimension is `r nrow(NYC_Transit)` rows by `r ncol(NYC_Transit)` columns. However, the data is NOT tidy yet because the route number (variables route1 to route11) is spread across 11 columns.
 
 **Distinct stations**
-```{r}
+```{r distin stations}
 distin_line = distinct(NYC_Transit[,c("line","station_name")])
 head(distin_line)
 ```
 The amount of distinct stations is `r nrow(distin_line)`
 
 **Ada-compliant data**
-```{r}
+```{r ada comp}
 distin_ada_comp = select(NYC_Transit, line, station_name, ada) %>%
   distinct() %>%
   filter(ada == "TRUE")
@@ -42,7 +42,7 @@ head(distin_ada_comp)
 There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 
 **Proportion of station exits without vending that allow entrance**
-```{r}
+```{r prop exits}
 distin_entry_novend = select(NYC_Transit, line, station_name, entry, vending) %>%
   distinct() %>%
   filter(vending == "NO")
@@ -52,7 +52,7 @@ prop_entry_novend = mean(distin_entry_novend$entry == "TRUE")
 The proportion of station entrances / exits without vending allow entrance is `r prop_entry_novend`
 
 **Reformat to tidy data**
-```{r}
+```{r p1 reformat}
 NYC_Transit = gather(NYC_Transit, key = "route_number", value = "route_name", route1:route11)
 station_line_a = distinct(NYC_Transit[,c("line","station_name","route_name","ada")]) %>%
   filter(route_name == "A")
@@ -63,7 +63,7 @@ There are `r nrow(station_line_a_ada)` distinct stations that serves the A train
 
 ## Problem 2
 **Read and clean Mr.Trash Wheel data**
-```{r}
+```{r clean trash data}
 dumps = 
   read_excel("./data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = 'Mr. Trash Wheel', range = cell_cols(1:14)) %>%
   janitor::clean_names() %>%
@@ -73,7 +73,7 @@ dumps$sports_balls = as.integer(dumps$sports_balls)
 ```
 
 **Read and clean Precip data for year 2016 and 2017**
-```{r}
+```{r clean precip data}
 precip_2016 = read_excel("data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = '2016 Precipitation',
                          range = "A2:B14") %>%
   na.omit(precip_2016)
@@ -87,7 +87,7 @@ colnames(precip_2017) = c("month", "total_precip_17")
 precip_2017$year_17 = 2017
 ```
 **Combine precip data for year 2016 and 2017**
-```{r}
+```{r combine 1617}
 precip_1617 = left_join(precip_2016, precip_2017,by = "month")
 precip_1617$month = month.name
 head(precip_1617)
@@ -98,11 +98,11 @@ The number of observations in the trash wheel data is `r nrow(dumps)` rows by `r
 
 ## Problem 3
 **load data from p8105 package**
-```{r loading data}
+```{r p3 loading data}
 library(p8105.datasets)
 ```
 **tidy and manipulate data**
-```{r}
+```{r p3 tidy}
 brfss = brfss_smart2010 %>%
   janitor::clean_names() %>%
   filter(str_detect(topic, "Overall Health") == TRUE) %>%
@@ -114,7 +114,7 @@ head(brfss)
 ```
 
 **unique locations**
-```{r}
+```{r uniq locs}
 num_uniq_location = length(unique(brfss$locationdesc))
 num_uniq_states = length(unique(brfss$locationabbr))
 freq_state = plyr::count(brfss, "locationabbr")
@@ -124,9 +124,18 @@ The number of unique locations is `r num_uniq_location`. The number of states th
 is `r num_uniq_states`. Since all 50 states are included, we conclude that all states are represented. `r highest_fre_state` is observed the most.
 
 **Excellent response in 2002**
-```{r}
+```{r exce 2002}
 brfss_2002 = filter(brfss,year == 2002)
 medi_2002_excellent = median(brfss_2002$excellent, na.rm = TRUE)
 ```
 The median of the excellent response value is `r medi_2002_excellent`.
+
+**Histogram of Excellent value in 2002**
+```{r hist of excellent in 2002, message=FALSE, warning= FALSE}
+ggplot(brfss_2002, aes(x = excellent)) +
+  geom_histogram() +
+  ggtitle("Excellent response value in 2002")         
+``` 
+
+The histogram of Excellent value in 2002 shows the proportion of excellent scores in total health measurement in different locations accross the country in the year 2002. the x axis is the proportion of excellent scores, and the y axis is the count of locations with certain score.
 
