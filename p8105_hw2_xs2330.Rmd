@@ -57,3 +57,12 @@ station_line_a_ada = filter(station_line_a, ada == TRUE)
 There are `r nrow(station_line_a)` distinct stations that serves the A train  
 There are `r nrow(station_line_a_ada)` distinct stations that serves the A train that are also ADA compliant
 
+## Problem 2
+**Read and clean Mr.Trash Wheel data**
+```{r}
+dumps = 
+  read_excel("./data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = 'Mr. Trash Wheel', range = cell_cols(1:14)) %>%
+  janitor::clean_names() %>%
+  na.omit(dumps)
+dumps$sports_balls = as.integer(dumps$sports_balls)
+```
