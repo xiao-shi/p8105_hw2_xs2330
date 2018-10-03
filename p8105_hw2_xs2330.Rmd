@@ -122,3 +122,11 @@ highest_fre_state = freq_state[which.max(freq_state$freq),1]
 ```
 The number of unique locations is `r num_uniq_location`. The number of states that's been represented
 is `r num_uniq_states`. Since all 50 states are included, we conclude that all states are represented. `r highest_fre_state` is observed the most.
+
+**Excellent response in 2002**
+```{r}
+brfss_2002 = filter(brfss,year == 2002)
+medi_2002_excellent = median(brfss_2002$excellent, na.rm = TRUE)
+```
+The median of the excellent response value is `r medi_2002_excellent`.
+
