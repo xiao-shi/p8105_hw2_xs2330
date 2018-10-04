@@ -17,9 +17,7 @@ library(readxl)
 NYC_Transit = 
   read_csv("./data_hw2/nyc_subway.csv") %>%
   janitor::clean_names() %>%
-  select(line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, 
-         route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada)
-head(NYC_Transit)
+  select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada)
 NYC_Transit$entry = ifelse(NYC_Transit$entry == 'YES', TRUE,FALSE)
 ```
 
@@ -28,8 +26,12 @@ The `NYC_transit` dataset contains detailed information on station, routing, sta
 **Distinct stations**
 ```{r distin stations}
 distin_line = distinct(NYC_Transit[,c("line","station_name")])
-head(distin_line)
 ```
+The resulting `distin_line` data
+```{r, echo=FALSE}
+knitr::kable(head(distin_line))
+```
+
 The amount of distinct stations is `r nrow(distin_line)`
 
 **Ada-compliant data**
@@ -37,8 +39,12 @@ The amount of distinct stations is `r nrow(distin_line)`
 distin_ada_comp = select(NYC_Transit, line, station_name, ada) %>%
   distinct() %>%
   filter(ada == "TRUE")
-head(distin_ada_comp)
 ```
+The resulting `distin_ada_comp` data
+```{r, echo=FALSE}
+knitr::kable(head(distin_ada_comp))
+```
+
 There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 
 **Proportion of station exits without vending that allow entrance**
@@ -46,9 +52,9 @@ There are `r nrow(distin_ada_comp)` stations that are ADA compliant
 distin_entry_novend = select(NYC_Transit, line, station_name, entry, vending) %>%
   distinct() %>%
   filter(vending == "NO")
-head(distin_entry_novend)
 prop_entry_novend = mean(distin_entry_novend$entry == "TRUE")
 ```
+
 The proportion of station entrances / exits without vending allow entrance is `r prop_entry_novend`
 
 **Reformat to tidy data**
@@ -58,43 +64,58 @@ station_line_a = distinct(NYC_Transit[,c("line","station_name","route_name","ada
   filter(route_name == "A")
 station_line_a_ada = filter(station_line_a, ada == TRUE)
 ```
+**final tidy data**
+The resulting `NYC_Transit` data
+```{r, echo=FALSE}
+knitr::kable(head(NYC_Transit), full_width = FALSE)
+```
+
 There are `r nrow(station_line_a)` distinct stations that serves the A train  
 There are `r nrow(station_line_a_ada)` distinct stations that serves the A train that are also ADA compliant
+
 
 ## Problem 2
 **Read and clean Mr.Trash Wheel data**
 ```{r clean trash data}
 dumps = 
-  read_excel("./data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = 'Mr. Trash Wheel', range = cell_cols(1:14)) %>%
+  read_excel("./data_hw2/HealthyHarborWaterWheelTotals2018-7-28.xlsx",sheet = 'Mr. Trash Wheel', range = cell_cols(1:14)) %>%
   janitor::clean_names() %>%
   na.omit(dumps)
-head(dumps)
 dumps$sports_balls = as.integer(dumps$sports_balls)
+```
+The resulting `dumps` data
+```{r, echo=FALSE}
+knitr::kable(head(dumps))
 ```
 
 **Read and clean Precip data for year 2016 and 2017**
 ```{r clean precip data}
-precip_2016 = read_excel("data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = '2016 Precipitation',
-                         range = "A2:B14") %>%
-  na.omit(precip_2016)
-colnames(precip_2016) = c("month", "total_precip_16")
-precip_2016$year_16 = 2016
+precip_2016 = read_excel("data_hw2/HealthyHarborWaterWheelTotals2018-7-28.xlsx",sheet = '2016 Precipitation',
+                         range = "A2:B14")
+colnames(precip_2016) = c("month", "total_precip")
+precip_2016$month = month.name
+precip_2016 = na.omit(precip_2016)
+precip_2016$year = 2016
 
-precip_2017 = read_excel("data_hw2/HealthyHarborWaterWheelTotals2017-9-26.xlsx",sheet = '2017 Precipitation',
-                         range = "A2:B14") %>%
-  na.omit(precip_2017)
-colnames(precip_2017) = c("month", "total_precip_17")
-precip_2017$year_17 = 2017
+precip_2017 = read_excel("data_hw2/HealthyHarborWaterWheelTotals2018-7-28.xlsx",sheet = '2017 Precipitation',
+                         range = "A2:B14")
+colnames(precip_2017) = c("month", "total_precip")
+precip_2017$month = month.name
+precip_2017 = na.omit(precip_2017)
+precip_2017$year = 2017
 ```
 **Combine precip data for year 2016 and 2017**
 ```{r combine 1617}
-precip_1617 = left_join(precip_2016, precip_2017,by = "month")
-precip_1617$month = month.name
-head(precip_1617)
+precip_1617 = bind_rows(precip_2016, precip_2017) %>%
+  select(year,month,total_precip)
+```
+The resulting `precip_1617` data
+```{r, echo=FALSE}
+knitr::kable(head(precip_1617))
 ```
 
 **Summary of problem2 data**     
-The number of observations in the trash wheel data is `r nrow(dumps)` rows by `r ncol(dumps)` columns. The number of observations in the precipitation data is `r nrow(precip_1617)` rows by `r ncol(precip_1617)` columns. Key variables in the trash wheel data includes trash wheel index by `dumpster`, date of collection by `date`, weight of the specific trash wheel by `weight_tons`, and types of trash collected such as `plastic_bottles`, `chips_bag`, and `sports_balls`. Key variables in the precipitation data includes precipitation data such as `total_precip_16` and `total_precip_17` for the year 2016 and 2017, by month. The total precipitation in 2017 was `r sum(precip_1617$total_precip_17, na.rm = TRUE)`. The median number of sports balls in the dumpster in 2016 was `r median(dumps$sports_balls)`.
+The number of observations in the trash wheel data is `r nrow(dumps)` rows by `r ncol(dumps)` columns. The number of observations in the precipitation data is `r nrow(precip_1617)` rows by `r ncol(precip_1617)` columns. Key variables in the trash wheel data includes trash wheel index by `dumpster`, date of collection by `date`, weight of the specific trash wheel by `weight_tons`, and types of trash collected such as `plastic_bottles`, `chips_bag`, and `sports_balls`. Key variables in the precipitation data includes precipitation data such as `total_precip` and `year` for the year 2016 and 2017, by month. The total precipitation in 2017 was `r sum(precip_2017$total_precip, na.rm = TRUE)`. The median number of sports balls in the dumpster in 2016 was `r median(dumps$sports_balls, na.rm = TRUE)`.
 
 ## Problem 3
 **load data from p8105 package**
@@ -110,7 +131,10 @@ brfss = brfss_smart2010 %>%
   spread(key = response, value = data_value) %>%
   janitor::clean_names() %>%
   mutate(exc_vgood = excellent + very_good)
-head(brfss)
+```
+The resulting `brfss` data
+```{r, echo=FALSE}
+knitr::kable(head(brfss), full_width = FALSE)
 ```
 
 **unique locations**
@@ -120,6 +144,7 @@ num_uniq_states = length(unique(brfss$locationabbr))
 freq_state = plyr::count(brfss, "locationabbr")
 highest_fre_state = freq_state[which.max(freq_state$freq),1]
 ```
+
 The number of unique locations is `r num_uniq_location`. The number of states that's been represented
 is `r num_uniq_states`. Since all 50 states are included, we conclude that all states are represented. `r highest_fre_state` is observed the most.
 
