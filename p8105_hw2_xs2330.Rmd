@@ -109,7 +109,7 @@ The resulting `precip_1617` data
 knitr::kable(head(precip_1617))
 ```
 
-**Summary of problem2 data**     
+**Summary of problem2 data**          
 The number of observations in the trash wheel data is `r nrow(dumps)` rows by `r ncol(dumps)` columns. The number of observations in the precipitation data is `r nrow(precip_1617)` rows by `r ncol(precip_1617)` columns. Key variables in the trash wheel data includes trash wheel index by `dumpster`, date of collection by `date`, weight of the specific trash wheel by `weight_tons`, and types of trash collected such as `plastic_bottles`, `chips_bag`, and `sports_balls`. Key variables in the precipitation data includes precipitation data such as `total_precip` and `year` for the year 2016 and 2017, by month. The total precipitation in 2017 was `r sum(precip_2017$total_precip, na.rm = TRUE)`. The median number of sports balls in the dumpster in 2016 was `r median(dumps$sports_balls, na.rm = TRUE)`.
 
 ## Problem 3
