@@ -64,11 +64,6 @@ station_line_a = distinct(NYC_Transit[,c("line","station_name","route_name","ada
   filter(route_name == "A")
 station_line_a_ada = filter(station_line_a, ada == TRUE)
 ```
-**final tidy data**
-The resulting `NYC_Transit` data
-```{r, echo=FALSE}
-knitr::kable(head(NYC_Transit), full_width = FALSE)
-```
 
 There are `r nrow(station_line_a)` distinct stations that serves the A train  
 There are `r nrow(station_line_a_ada)` distinct stations that serves the A train that are also ADA compliant
@@ -83,9 +78,9 @@ dumps =
   na.omit(dumps)
 dumps$sports_balls = as.integer(dumps$sports_balls)
 ```
-The resulting `dumps` data
+The resulting `dumps` data (column 1 through 6)
 ```{r, echo=FALSE}
-knitr::kable(head(dumps))
+knitr::kable(head(dumps[,1:6]))
 ```
 
 **Read and clean Precip data for year 2016 and 2017**
@@ -132,9 +127,9 @@ brfss = brfss_smart2010 %>%
   janitor::clean_names() %>%
   mutate(exc_vgood = excellent + very_good)
 ```
-The resulting `brfss` data
+The resulting `brfss` data (showing column 1 through 6)
 ```{r, echo=FALSE}
-knitr::kable(head(brfss), full_width = FALSE)
+knitr::kable(head(brfss[,1:6]))
 ```
 
 **unique locations**
